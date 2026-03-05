@@ -1,11 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>ITGames market</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+        h1 { color: #2c3e50; }
+        .section { margin-bottom: 30px; }
+        .tovar-item, .koszyk-item { margin-bottom: 10px; }
+        input[type=text], input[type=number] { width: 150px; margin-left: 10px; }
+        button { margin-left: 10px; padding: 5px 10px; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <h1>My site</h1>
+    <h1>ITGames market</h1>
+
+    <div class="section">
+        <h2>Додати новий товар у магазин</h2>
+        <input type="text" id="new-name" placeholder="Назва товару">
+        <input type="number" id="new-price" placeholder="Ціна" min="1">
+        <button onclick="dodatyNovyyTovar()">Додати</button>
+    </div>
+
+    <div class="section">
+        <h2>Товари</h2>
+        <div id="tovary-list"></div>
+    </div>
+
+    <div class="section">
+        <h2>Кошик</h2>
+        <div id="koszyk-list"></div>
+        <p id="suma">Загальна сума: 0 грн</p>
+        <button onclick="ochystytyKoszyk()">Очистити кошик</button>
+    </div>
+
+    <script>
+        let tovaryMagazynu = [
+            {nazva: "Mini game", tsina: 20},
+            {nazva: "Site", tsina: 25},
+            {nazva: "Bot", tsina: 15}
+        ];
+
+        let koszyk = [];
+
+        function pokazatyTovary() {
+            const list = document.getElementById("tovary-list");
+            list.innerHTML = "";
+            tovaryMagazynu.forEach((t, i) => {
+                const div = document.createElement("div");
+                div.className = "tovar-item";
+                div.innerHTML = `
+                    ${t.nazva} — ${t.tsina} грн
+                    <input type="number" id="kol-${i}" value="1" min="1">
+                    <button onclick="dodatyDoKoszyka(${i})">Додати</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function dodatyNovyyTovar() {
+            const name = document.getElementById("new-name").value.trim();
+            const price = parseInt(document.getElementById("new-price").value);
+            if(name && price > 0) {
+                tovaryMagazynu.push({nazva: name, tsina: price});
+                document.getElementById("new-name").value = "";
+                document.getElementById("new-price").value = "";
+                pokazatyTovary();
+            } else {
+                alert("Введіть назву та правильну ціну товару!");
+            }
+        }
+
+        function dodatyDoKoszyka(index) {
+            const koli = parseInt(document.getElementById(`kol-${index}`).value);
+            const tovar = {...tovaryMagazynu[index], koli: koli};
+            koszyk.push(tovar);
+            pokazatyKoszyk();
+        }
+
+        function pokazatyKoszyk() {
+            const list = document.getElementById("koszyk-list");
+            list.innerHTML = "";
+            let suma = 0;
+            koszyk.forEach((t, i) => {
+                const div = document.createElement("div");
+                div.className = "koszyk-item";
+                div.innerHTML = `${t.nazva} — ${t.tsina} грн × ${t.koli} 
+                    <button onclick="vidalytyZKoszyka(${i})">Видалити</button>`;
+                list.appendChild(div);
+                suma += t.tsina * t.koli;
+            });
+            document.getElementById("suma").textContent = `Загальна сума: ${suma} грн`;
+        }
+
+        function vidalytyZKoszyka(index) {
+            koszyk.splice(index, 1);
+            pokazatyKoszyk();
+        }
+
+        function ochystytyKoszyk() {
+            koszyk = [];
+            pokazatyKoszyk();
+        }
+
+        pokazatyTovary();
+    </script>
 </body>
 </html>
